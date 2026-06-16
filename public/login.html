@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KicksTrend | MEMBER AUTH 會員中心</title>
+    <style>
+        /* 全域極簡潮流黑白風格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif;
+        }
+        body {
+            background-color: #fafafa;
+            color: #111;
+        }
+
+        /* 高級街頭感導覽列 */
+        nav {
+            background-color: #000;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        nav .logo {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+        nav .nav-links a {
+            color: #aaa;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s;
+            letter-spacing: 1px;
+        }
+        nav .nav-links a:hover {
+            color: #fff;
+        }
+
+        /* 登入卡片容器 */
+        .login-container {
+            max-width: 420px;
+            margin: 80px auto;
+            background: #fff;
+            border: 1px solid #111;
+            padding: 40px 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            text-align: left;
+        }
+        .login-container h2 {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #111;
+        }
+
+        /* 輸入框組件 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.3s;
+            color: #222;
+        }
+        .form-group input:focus {
+            border-color: #111;
+        }
+
+        /* 潮流黑白雙按鈕排版 */
+        .btn-wrapper {
+            margin-top: 25px;
+        }
+        .primary-btn {
+            width: 100%;
+            background: #111;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .primary-btn:hover {
+            background: #444;
+        }
+        .secondary-btn {
+            width: 100%;
+            background: #fff;
+            color: #111;
+            border: 1px solid #111;
+            padding: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .secondary-btn:hover {
+            background: #111;
+            color: #fff;
+        }
+
+        /* 後台提示框 */
+        .admin-hint {
+            margin-top: 25px;
+            padding: 12px 15px;
+            background: #fdfdfd;
+            border-left: 3px solid #ccc;
+            color: #777;
+            font-size: 11px;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">KicksTrend</a>
+        <div class="nav-links">
+            <a href="index.html">SHOP 回首頁</a>
+            <a href="cart.html">CART 購物車</a>
+            <a href="login.html">AUTH 登入/註冊</a>
+            <a href="admin.html">DASHBOARD 後台</a>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <h2>MEMBER AUTH</h2>
+        
+        <div class="form-group">
+            <label>Username / 帳號</label>
+            <input type="text" id="username" placeholder="Enter your username...">
+        </div>
+        
+        <div class="form-group">
+            <label>Password / 密碼</label>
+            <input type="password" id="password" placeholder="Enter your password...">
+        </div>
+
+        <div class="btn-wrapper">
+            <button class="primary-btn" onclick="auth('login')">LOG IN / 會員登入</button>
+            <button class="secondary-btn" onclick="auth('register')">REGISTER / 註冊新帳號</button>
+        </div>
+
+        <div class="admin-hint">
+            💡 <strong>系統提示：</strong><br>
+            預設的管理員帳號為 <span style="color:#111; font-weight:700;">admin</span> / <span style="color:#111; font-weight:700;">admin123</span>，登入後系統將自動引導至後台數據大盤（Dashboard）。
+        </div>
+    </div>
+
+    <script>
+        function auth(action) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                return alert('請填寫帳號與密碼！');
+            }
+
+            // 連線到 Node.js 後端驗證路由
+            fetch(`/api/auth/${action}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) return alert(data.error);
+                
+                if (action === 'register') {
+                    alert(' 註冊成功！請點擊「會員登入」按鈕進入商店。');
+                } else {
+                    // 完美保存妳鎖定狀態的快取邏輯
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+                    alert(' 登入成功！歡迎回來，' + data.username + '。');
+                    
+                    // 根據角色自動判斷跳轉
+                    window.location.href = data.role === 'admin' ? 'admin.html' : 'index.html';
+                }
+            })
+            .catch(err => {
+                console.error("驗證失敗：", err);
+                alert('連線失敗，請確認後端 server.js 運作狀態。');
+            });
+        }
+    </script>
+</body>
+</html>
