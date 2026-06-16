@@ -1,9 +1,6 @@
 import os
 import webbrowser
 
-# 設定你要輸出的 HTML 檔案路徑
-output_file = "c:/Users/ellen/OneDrive/桌面/視覺化_互動報表.html"
-# 完整合併後的 HTML + Plotly.js 四圖表核心內容
 html_content = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -241,12 +238,5 @@ html_content = """<!DOCTYPE html>
 </body>
 </html>
 """
-
-# 將寫好的 HTML 檔案輸出至指定目標路徑
-with open(output_file, "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-print(f"✅ 成功產生網頁檔案：{output_file}")
-
 # 自動使用系統預設瀏覽器打開網頁
 webbrowser.open('file://' + os.path.realpath(output_file))
