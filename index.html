@@ -1,9 +1,15 @@
-<!DOCTYPE html>
+import os
+import webbrowser
+
+# 設定你要輸出的 HTML 檔案路徑
+output_file = "c:/Users/ellen/OneDrive/桌面/視覺化_互動報表.html"
+# 完整合併後的 HTML + Plotly.js 四圖表核心內容
+html_content = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台北青年居住壓力互動大數據控制台</title>
+    <title>台北青年居住壓力大數據互動控制台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.24.1/plotly.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,13 +19,14 @@
         .modebar { display: none !important; }
     </style>
 </head>
-<body class="text-slate-100 p-6 min-h-screen flex flex-col justify-between">
+<body class="text-slate-100 p-6 min-h-screen flex flex-col justify-between select-none">
 
     <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
         <div>
             <h1 class="text-3xl font-bold text-white tracking-wide flex items-center gap-2">
-                台北青年居住壓力大數據互動控制台
+                📊 台北青年居住壓力大數據互動控制台
             </h1>
+            <p class="text-slate-400 text-xs mt-1">數據可視化控制台：僵固房租與所得震盪之消長趨勢（107年－113年）── final_data 矩陣動態全聯動</p>
         </div>
         <div class="text-right text-xs text-slate-500 font-mono hidden sm:block">
             Plotly.js & Tailwind CSS Engine
@@ -40,18 +47,18 @@
             </div>
 
             <div class="grid grid-cols-1 gap-3">
-                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80">
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 flex flex-col justify-center shadow-md">
                     <div class="text-xs text-slate-400 font-medium">住宅租金累積漲幅 (基期107年)</div>
                     <div id="kpiRent" class="text-3xl font-bold font-mono text-amber-500 mt-1">+10.40%</div>
                 </div>
                 
-                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 transition-all duration-300" id="kpiCardBurden">
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 transition-all duration-300 flex flex-col justify-center shadow-md" id="kpiCardBurden">
                     <div class="text-xs text-slate-400 font-medium">青年實質房租負擔率 (10坪獨立套房)</div>
                     <div id="kpiBurden" class="text-3xl font-bold font-mono text-rose-500 mt-1">30.01%</div>
                     <div id="kpiAlert" class="text-[11px] text-rose-400 font-bold mt-1.5 hidden">⚠️ 已衝破 30% 國際租金貧窮警戒線</div>
                 </div>
                 
-                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80">
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 flex flex-col justify-center shadow-md">
                     <div class="text-xs text-slate-400 font-medium">青年實質生活自由度 (剩餘可支配預算)</div>
                     <div id="kpiFreedom" class="text-3xl font-bold font-mono text-sky-400 mt-1">69.99%</div>
                 </div>
@@ -64,22 +71,22 @@
 
         <div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px]">
+            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px] shadow-xl">
                 <div class="text-sm font-bold text-slate-200 border-l-4 border-rose-500 pl-2 mb-2">📈 圖一：租金 vs 所得累積漲幅賽跑</div>
                 <div id="chart1" class="w-full flex-grow"></div>
             </div>
 
-            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px]">
+            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px] shadow-xl">
                 <div class="text-sm font-bold text-slate-200 border-l-4 border-amber-500 pl-2 mb-2">🚨 圖二：10坪套房實質剛性房租負擔率</div>
                 <div id="chart2" class="w-full flex-grow"></div>
             </div>
 
-            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px]">
+            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px] shadow-xl">
                 <div class="text-sm font-bold text-slate-200 border-l-4 border-sky-400 pl-2 mb-2">📊 圖三：可支配所得結構百分比堆疊圖</div>
                 <div id="chart3" class="w-full flex-grow"></div>
             </div>
 
-            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px]">
+            <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700 flex flex-col h-[320px] shadow-xl">
                 <div class="text-sm font-bold text-slate-200 border-l-4 border-emerald-500 pl-2 mb-2">🐸 圖四：居住壓力歷年動態氣泡軌跡</div>
                 <div id="chart4" class="w-full flex-grow"></div>
             </div>
@@ -93,7 +100,7 @@
     </div>
 
     <script>
-        // 匯入你們 Excel (final_data.xlsx) 的真實實證數據矩陣
+        // 匯入 Excel (final_data.xlsx) 的真實實證數據矩陣
         const dataset = {
             107: { rentIdx: "+0.00%",  burden: "29.27%", freedom: "70.73%", alert: false, rentVal: 29.27, freeVal: 70.73, rentIdxNum: 0.0,  incGrowth: 0.0,  rentPerPing: 1173, income: 480984 },
             108: { rentIdx: "+0.40%",  burden: "28.08%", freedom: "71.92%", alert: false, rentVal: 28.08, freeVal: 71.92, rentIdxNum: 0.4,  incGrowth: 4.69, rentPerPing: 1178, income: 503564 },
@@ -116,7 +123,7 @@
         const kpiAlert = document.getElementById('kpiAlert');
         const kpiCardBurden = document.getElementById('kpiCardBurden');
 
-        // 共同的 Plotly 樣式設定（維持深色主題美感）
+        // 共同的 Plotly 樣式設定
         const commonLayoutProperties = {
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
@@ -148,12 +155,12 @@
             // ------------------ 圖二：生存的紅線 ------------------
             const traceBurdenLine = {
                 x: yearLabels, y: years.map(y => dataset[y].rentVal),
-                type: 'scatter', mode: 'lines+markers',
+                name: '房租負擔率', type: 'scatter', mode: 'lines+markers',
                 line: { color: '#f59e0b', width: 3 }, marker: { size: years.map(y => y == activeYear ? 12 : 6), color: '#f59e0b' }
             };
             const traceAlertLine = {
                 x: yearLabels, y: [30,30,30,30,30,30,30],
-                type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 1.5, dash: 'dash' }
+                name: '警戒線', type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 1.5, dash: 'dash' }
             };
             Plotly.newPlot('chart2', [traceBurdenLine, traceAlertLine], {
                 ...commonLayoutProperties,
@@ -161,24 +168,26 @@
             }, {displayModeBar: false, responsive: true});
 
             // ------------------ 圖三：百分比堆疊圖 ------------------
-            // 動態調整高亮色彩：選中年份用亮色，其餘年份用暗色
             const rentColors = years.map(y => y == activeYear ? '#ef4444' : '#7f1d1d');
             const freedomColors = years.map(y => y == activeYear ? '#38bdf8' : '#1e3a8a');
 
             const traceStackRent = {
                 x: yearLabels, y: years.map(y => dataset[y].rentVal),
-                name: '房租預算', type: 'bar', marker: { color: rentColors }
+                name: '房租預算 (%)', type: 'bar', marker: { color: rentColors }, hovertemplate: '%{x}<br>房租佔比: %{y}%<extra></extra>'
             };
             const traceStackFreedom = {
                 x: yearLabels, y: years.map(y => dataset[y].freeVal),
-                name: '生活自由度', type: 'bar', marker: { color: freedomColors }
+                name: '生活自由度 (%)', type: 'bar', marker: { color: freedomColors }, hovertemplate: '%{x}<br>生活自由度: %{y}%<extra></extra>'
             };
             Plotly.newPlot('chart3', [traceStackRent, traceStackFreedom], {
-                ...commonLayoutProperties, barmode: 'stack', yaxis: { ...commonLayoutProperties.yaxis, range: [0, 100] }
+                ...commonLayoutProperties, 
+                barmode: 'stack', 
+                showlegend: true,
+                legend: { font: { color: '#94a3b8', size: 10 }, orientation: 'h', x: 0, y: 1.15 },
+                yaxis: { ...commonLayoutProperties.yaxis, range: [0, 100] }
             }, {displayModeBar: false, responsive: true});
 
             // ------------------ 圖四：溫水煮青蛙氣泡軌跡 ------------------
-            // 當前年份的氣泡放大且變成亮紅色，其餘年份為歷史軌跡暗藍色
             const bubbleColors = years.map(y => y == activeYear ? '#f43f5e' : '#334155');
             const bubbleSizes = years.map(y => y == activeYear ? 35 : 16);
             
@@ -190,7 +199,8 @@
                 type: 'scatter',
                 textposition: 'top center',
                 textfont: { color: '#94a3b8', size: 10 },
-                marker: { size: bubbleSizes, color: bubbleColors, line: { color: '#fff', width: years.map(y => y == activeYear ? 2 : 0) } }
+                marker: { size: bubbleSizes, color: bubbleColors, line: { color: '#fff', width: years.map(y => y == activeYear ? 2 : 0) } },
+                hovertemplate: '年份: %{text}<br>房租負擔率: %{x}%<br>生活自由度: %{y}%<extra></extra>'
             };
             Plotly.newPlot('chart4', [traceBubble], {
                 ...commonLayoutProperties,
@@ -207,18 +217,18 @@
             kpiBurden.innerText = data.burden;
             kpiFreedom.innerText = data.freedom;
 
-            // 112年衝破防線時的「呼吸燈警示」與配色切換
+            // 112年衝破防線時的呼吸燈特效
             if (data.alert) {
                 kpiAlert.classList.remove('hidden');
-                kpiCardBurden.className = "bg-rose-950/40 p-4 rounded-xl border-2 border-rose-500 shadow-lg shadow-rose-500/20 transition-all duration-300";
+                kpiCardBurden.className = "bg-rose-950/40 p-4 rounded-xl border-2 border-rose-500 shadow-lg shadow-rose-500/20 transition-all duration-300 flex flex-col justify-center";
                 kpiBurden.className = "text-3xl font-bold font-mono text-rose-400 mt-1 animate-pulse";
             } else {
                 kpiAlert.classList.add('hidden');
-                kpiCardBurden.className = "bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 transition-all duration-300";
+                kpiCardBurden.className = "bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 transition-all duration-300 flex flex-col justify-center";
                 kpiBurden.className = "text-3xl font-bold font-mono text-slate-300 mt-1";
             }
             
-            // 驅動四大圖表聯動高亮
+            // 驅動四大圖表聯動
             updateCharts(year);
         }
 
@@ -230,3 +240,13 @@
     </script>
 </body>
 </html>
+"""
+
+# 將寫好的 HTML 檔案輸出至指定目標路徑
+with open(output_file, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print(f"✅ 成功產生網頁檔案：{output_file}")
+
+# 自動使用系統預設瀏覽器打開網頁
+webbrowser.open('file://' + os.path.realpath(output_file))
