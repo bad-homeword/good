@@ -1,6 +1,10 @@
 import os
 import webbrowser
 
+# 🛠️ 【核心修正】定義你要把網頁檔案存去哪裡
+# 這裡設定 "index.html" 代表直接儲存到你目前 VS Code 打開的專案資料夾裡（最安全、最乾淨！）
+output_file = "index.html"
+
 html_content = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -97,7 +101,6 @@ html_content = """<!DOCTYPE html>
     </div>
 
     <script>
-        // 匯入 Excel (final_data.xlsx) 的真實實證數據矩陣
         const dataset = {
             107: { rentIdx: "+0.00%",  burden: "29.27%", freedom: "70.73%", alert: false, rentVal: 29.27, freeVal: 70.73, rentIdxNum: 0.0,  incGrowth: 0.0,  rentPerPing: 1173, income: 480984 },
             108: { rentIdx: "+0.40%",  burden: "28.08%", freedom: "71.92%", alert: false, rentVal: 28.08, freeVal: 71.92, rentIdxNum: 0.4,  incGrowth: 4.69, rentPerPing: 1178, income: 503564 },
@@ -111,7 +114,6 @@ html_content = """<!DOCTYPE html>
         const years = Object.keys(dataset);
         const yearLabels = years.map(y => y + '年');
 
-        // 綁定 DOM 元件
         const slider = document.getElementById('yearSlider');
         const yearDisplay = document.getElementById('yearDisplay');
         const kpiRent = document.getElementById('kpiRent');
@@ -120,7 +122,6 @@ html_content = """<!DOCTYPE html>
         const kpiAlert = document.getElementById('kpiAlert');
         const kpiCardBurden = document.getElementById('kpiCardBurden');
 
-        // 共同的 Plotly 樣式設定
         const commonLayoutProperties = {
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
@@ -130,10 +131,7 @@ html_content = """<!DOCTYPE html>
             yaxis: { tickfont: { color: '#94a3b8', size: 11 }, gridcolor: '#334155' }
         };
 
-        // 全域圖表渲染引擎
         function updateCharts(activeYear) {
-            
-            // ------------------ 圖一：速度的賽跑 ------------------
             const traceRentLine = {
                 x: yearLabels, y: years.map(y => dataset[y].rentIdxNum),
                 name: '租金漲幅', type: 'scatter', mode: 'lines+markers',
@@ -149,7 +147,6 @@ html_content = """<!DOCTYPE html>
                 yaxis: { ...commonLayoutProperties.yaxis, title: { text: '累積漲幅 (%)', font: { color: '#64748b', size: 10 } } }
             }, {displayModeBar: false, responsive: true});
 
-            // ------------------ 圖二：生存的紅線 ------------------
             const traceBurdenLine = {
                 x: yearLabels, y: years.map(y => dataset[y].rentVal),
                 name: '房租負擔率', type: 'scatter', mode: 'lines+markers',
@@ -164,7 +161,6 @@ html_content = """<!DOCTYPE html>
                 yaxis: { tickfont: { color: '#94a3b8' }, range: [24, 33], gridcolor: '#334155' }
             }, {displayModeBar: false, responsive: true});
 
-            // ------------------ 圖三：百分比堆疊圖 ------------------
             const rentColors = years.map(y => y == activeYear ? '#ef4444' : '#7f1d1d');
             const freedomColors = years.map(y => y == activeYear ? '#38bdf8' : '#1e3a8a');
 
@@ -184,7 +180,6 @@ html_content = """<!DOCTYPE html>
                 yaxis: { ...commonLayoutProperties.yaxis, range: [0, 100] }
             }, {displayModeBar: false, responsive: true});
 
-            // ------------------ 圖四：溫水煮青蛙氣泡軌跡 ------------------
             const bubbleColors = years.map(y => y == activeYear ? '#f43f5e' : '#334155');
             const bubbleSizes = years.map(y => y == activeYear ? 35 : 16);
             
@@ -206,7 +201,6 @@ html_content = """<!DOCTYPE html>
             }, {displayModeBar: false, responsive: true});
         }
 
-        // 動態控制面板更新機制
         function updateDashboard(year) {
             const data = dataset[year];
             yearDisplay.innerText = year + '年';
@@ -214,7 +208,6 @@ html_content = """<!DOCTYPE html>
             kpiBurden.innerText = data.burden;
             kpiFreedom.innerText = data.freedom;
 
-            // 112年衝破防線時的呼吸燈特效
             if (data.alert) {
                 kpiAlert.classList.remove('hidden');
                 kpiCardBurden.className = "bg-rose-950/40 p-4 rounded-xl border-2 border-rose-500 shadow-lg shadow-rose-500/20 transition-all duration-300 flex flex-col justify-center";
@@ -224,19 +217,19 @@ html_content = """<!DOCTYPE html>
                 kpiCardBurden.className = "bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 transition-all duration-300 flex flex-col justify-center";
                 kpiBurden.className = "text-3xl font-bold font-mono text-slate-300 mt-1";
             }
-            
-            // 驅動四大圖表聯動
             updateCharts(year);
         }
 
-        // 綁定滑塊監聽事件
         slider.addEventListener('input', (e) => updateDashboard(e.target.value));
-        
-        // 初始化預設停在黃金關鍵年：112年
         updateDashboard(112);
     </script>
 </body>
 </html>
 """
+
+# 🛠️ 【核心修正】將 HTML 內容真正寫入檔案中
+with open(output_file, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
 # 自動使用系統預設瀏覽器打開網頁
 webbrowser.open('file://' + os.path.realpath(output_file))
